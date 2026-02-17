@@ -1,5 +1,12 @@
 # Guía de Deployment - Talento Videns
 
+## Cómo está hecho
+
+- **Una sola app Express** en la raíz (`index.js`) que:
+  - Sirve la API en `/api/*`
+  - Sirve el frontend estático desde `client/dist` (tras el build)
+- **Vercel** ejecuta `npm run build` (genera `client/dist`) y usa `index.js` como función serverless.
+
 ## Desplegar en Vercel
 
 ### Prerequisitos
@@ -38,11 +45,11 @@ git push -u origin main
    - Selecciona el repositorio `talento-videns`
 
 2. **Configuración del proyecto**:
-   - **Framework Preset**: Vite
-   - **Root Directory**: `client` (o deja en blanco)
-   - **Build Command**: `cd client && npm install && npm run build`
-   - **Output Directory**: `client/dist`
-   - **Install Command**: `npm install` (en la raíz)
+   - **Root Directory**: déjalo vacío (raíz del repo)
+   - **Framework Preset**: Other (o Vite, no importa)
+   - **Build Command**: `npm run build` (ya está en vercel.json)
+   - **Output Directory**: no configurar (la app Express sirve todo)
+   - **Install Command**: `npm install` (por defecto)
 
 3. **Variables de entorno** (opcional):
    - No necesitas variables de entorno para el deployment básico
