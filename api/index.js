@@ -285,5 +285,9 @@ app.get('/api/filtros', (req, res) => {
   }
 });
 
-// Exportar para Vercel Serverless
-module.exports = app;
+// Exportar para Vercel Serverless Functions
+// Vercel espera un handler que reciba (req, res)
+module.exports = (req, res) => {
+  // Manejar todas las rutas con Express
+  app(req, res);
+};
