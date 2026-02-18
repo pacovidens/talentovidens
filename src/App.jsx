@@ -74,6 +74,7 @@ export default function App() {
     return { categorias, areas, jobTitles, skills: [...skillsSet].sort() }
   }, [raw])
 
+  const top30 = useMemo(() => sorted.slice(0, 30), [sorted])
   const top50 = useMemo(() => sorted.slice(0, 50), [sorted])
 
   const categoriasParaSeccion = useMemo(() => {
@@ -157,7 +158,24 @@ export default function App() {
           />
         </div>
 
-        {/* Resultados de búsqueda/filtros: justo debajo de los filtros */}
+        {/* Top 30 por score: con video embebido */}
+        <div className="mb-10">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Top 30 por score</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {top30.map((c, i) => (
+              <CandidateCard
+                key={c.id ?? i}
+                candidato={c}
+                showScore
+                embedVideo
+                isSelected={selected?.id === c.id}
+                onSelect={() => setSelected(selected?.id === c.id ? null : c)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Resultados de búsqueda/filtros */}
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           {filtered.length} candidato{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
         </h2>

@@ -1,10 +1,21 @@
 import { useState } from 'react'
 import { User, Mail, Phone, Briefcase, MapPin, Calendar, Video, Film, Link as LinkIcon, Linkedin, ChevronDown, ChevronUp } from 'lucide-react'
 
-export default function CandidateCard({ candidato, isSelected, onSelect, showScore = false }) {
+/** Extrae el ID de video de Vimeo para embeber (solo URLs de video, no de perfil de usuario). */
+function getVimeoVideoId(url) {
+  if (!url || typeof url !== 'string') return null
+  const u = url.trim()
+  // No embeber páginas de usuario (vimeo.com/user123)
+  if (/vimeo\.com\/user\d+/i.test(u)) return null
+  const m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/i)
+  return m ? m[1] : null
+}
+
+export default function CandidateCard({ candidato, isSelected, onSelect, showScore = false, embedVideo = false }) {
   const [showLinks, setShowLinks] = useState(false)
   const hasLinks = candidato.video_link || candidato.reel_link || candidato.portfolio_link || candidato.linkedin_link
   const score = candidato.score != null && candidato.score !== '' ? Number(candidato.score) : null
+  const vimeoId = embedVideo ? getVimeoVideoId(candidato.video_link || candidato.reel_link) : null
 
   return (
     <div
@@ -65,6 +76,19 @@ export default function CandidateCard({ candidato, isSelected, onSelect, showSco
             {candidato.skills.map((s, i) => (
               <span key={i} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded">{s}</span>
             ))}
+          </div>
+        )}
+
+        {embedVideo && vimeoId && (
+          <div className="mb-4 rounded-lg overflow-hidden bg-gray-900 aspect-video" onClick={e => e.stopPropagation()}>
+            <iframe
+              src={`https://player.vimeo.com/video/${vimeoId}`}
+              className="w-full h-full"
+              frameBorder="0"
+              allow="fullscreen; autoplay; encrypted-media"
+              allowFullScreen
+              title={`Video de ${candidato.nombre}`}
+            />
           </div>
         )}
 
