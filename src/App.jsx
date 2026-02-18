@@ -157,22 +157,18 @@ export default function App() {
           />
         </div>
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Candidatos por categoría (top 50)</h2>
-          <CategoryCards categorias={categoriasParaSeccion} selected={selected} onSelect={setSelected} />
-        </div>
-
+        {/* Resultados de búsqueda/filtros: justo debajo de los filtros */}
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           {filtered.length} candidato{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
         </h2>
 
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+          <div className="bg-white rounded-lg shadow-sm p-12 text-center mb-8">
             <Search className="mx-auto h-12 w-12 text-gray-400 mb-4" />
             <p className="text-gray-600">No hay candidatos con esos filtros.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
             {filtered.map((c, i) => (
               <CandidateCard
                 key={c.id ?? i}
@@ -184,6 +180,12 @@ export default function App() {
             ))}
           </div>
         )}
+
+        {/* Tarjetas por categoría (top 50): más abajo */}
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Candidatos por categoría (top 50)</h2>
+          <CategoryCards categorias={categoriasParaSeccion} selected={selected} onSelect={setSelected} />
+        </div>
       </div>
     </div>
   )
