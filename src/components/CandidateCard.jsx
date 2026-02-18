@@ -5,17 +5,38 @@ import { User, Mail, Phone, Briefcase, MapPin, Calendar, Video, Film, Link as Li
 function getVimeoVideoId(url) {
   if (!url || typeof url !== 'string') return null
   const u = url.trim()
-  // No embeber páginas de usuario (vimeo.com/user123)
   if (/vimeo\.com\/user\d+/i.test(u)) return null
   const m = u.match(/vimeo\.com\/(?:video\/)?(\d+)/i)
   return m ? m[1] : null
+}
+
+/** Extrae el ID de video de YouTube para embeber. */
+function getYouTubeVideoId(url) {
+  if (!url || typeof url !== 'string') return null
+  const u = url.trim()
+  // youtu.be/VIDEO_ID, youtube.com/watch?v=VIDEO_ID, youtube.com/embed/VIDEO_ID
+  const short = u.match(/(?:youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/i)
+  if (short) return short[1]
+  const watch = u.match(/(?:youtube\.com\/watch\?.*[?&]v=)([a-zA-Z0-9_-]{11})/i)
+  return watch ? watch[1] : null
+}
+
+/** Devuelve { type: 'vimeo'|'youtube', id } o null para el primer enlace embeber que encuentre. */
+function getEmbedVideo(videoLink, reelLink) {
+  for (const url of [videoLink, reelLink].filter(Boolean)) {
+    const vimeoId = getVimeoVideoId(url)
+    if (vimeoId) return { type: 'vimeo', id: vimeoId }
+    const ytId = getYouTubeVideoId(url)
+    if (ytId) return { type: 'youtube', id: ytId }
+  }
+  return null
 }
 
 export default function CandidateCard({ candidato, isSelected, onSelect, showScore = false, embedVideo = false }) {
   const [showLinks, setShowLinks] = useState(false)
   const hasLinks = candidato.video_link || candidato.reel_link || candidato.portfolio_link || candidato.linkedin_link
   const score = candidato.score != null && candidato.score !== '' ? Number(candidato.score) : null
-  const vimeoId = embedVideo ? getVimeoVideoId(candidato.video_link || candidato.reel_link) : null
+  const embed = embedVideo ? getEmbedVideo(candidato.video_link, candidato.reel_link) : null
 
   return (
     <div
@@ -79,16 +100,28 @@ export default function CandidateCard({ candidato, isSelected, onSelect, showSco
           </div>
         )}
 
-        {embedVideo && vimeoId && (
+        {embed && (
           <div className="mb-4 rounded-lg overflow-hidden bg-gray-900 aspect-video" onClick={e => e.stopPropagation()}>
-            <iframe
-              src={`https://player.vimeo.com/video/${vimeoId}`}
-              className="w-full h-full"
-              frameBorder="0"
-              allow="fullscreen; autoplay; encrypted-media"
-              allowFullScreen
-              title={`Video de ${candidato.nombre}`}
-            />
+            {embed.type === 'vimeo' && (
+              <iframe
+                src={`https://player.vimeo.com/video/${embed.id}`}
+                className="w-full h-full"
+                frameBorder="0"
+                allow="fullscreen; autoplay; encrypted-media"
+                allowFullScreen
+                title={`Video de ${candidato.nombre}`}
+              />
+            )}
+            {embed.type === 'youtube' && (
+              <iframe
+                src={`https://www.youtube.com/embed/${embed.id}`}
+                className="w-full h-full"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                title={`Video de ${candidato.nombre}`}
+              />
+            )}
           </div>
         )}
 
