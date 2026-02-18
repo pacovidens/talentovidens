@@ -158,24 +158,7 @@ export default function App() {
           />
         </div>
 
-        {/* Top 30 por score: con video embebido */}
-        <div className="mb-10">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Top 30 por score</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {top30.map((c, i) => (
-              <CandidateCard
-                key={c.id ?? i}
-                candidato={c}
-                showScore
-                embedVideo
-                isSelected={selected?.id === c.id}
-                onSelect={() => setSelected(selected?.id === c.id ? null : c)}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Resultados de búsqueda/filtros */}
+        {/* Resultados de búsqueda/filtros: justo debajo de filtros, arriba de todo */}
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           {filtered.length} candidato{filtered.length !== 1 ? 's' : ''} encontrado{filtered.length !== 1 ? 's' : ''}
         </h2>
@@ -199,7 +182,24 @@ export default function App() {
           </div>
         )}
 
-        {/* Tarjetas por categoría (top 50): más abajo */}
+        {/* Top 30 por score: con video embebido */}
+        <div className="mb-10">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Top 30 por score</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {top30.map((c, i) => (
+              <CandidateCard
+                key={c.id ?? i}
+                candidato={c}
+                showScore
+                embedVideo
+                isSelected={selected?.id === c.id}
+                onSelect={() => setSelected(selected?.id === c.id ? null : c)}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Tarjetas por categoría (top 50) */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Candidatos por categoría (top 50)</h2>
           <CategoryCards categorias={categoriasParaSeccion} selected={selected} onSelect={setSelected} />
