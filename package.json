@@ -1,32 +1,23 @@
 {
   "name": "talento-videns",
+  "private": true,
   "version": "1.0.0",
-  "description": "Plataforma de gestión de talento humano",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "cd server && npm run dev",
-    "client": "cd client && npm run dev",
-    "start": "node index.js",
-    "build": "cd client && npm install && npm run build",
-    "install-all": "npm install && cd server && npm install && cd ../client && npm install"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "keywords": [
-    "talent",
-    "recruitment",
-    "hr"
-  ],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.2",
-    "sql.js": "^1.14.0"
-  },
-  "optionalDependencies": {
-    "better-sqlite3": "^9.2.2"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.294.0"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "vite": "^5.0.8"
   }
 }
