@@ -5,7 +5,7 @@ import CandidateCard from './components/CandidateCard'
 import CategoryCards from './components/CategoryCards'
 import { Search } from 'lucide-react'
 
-const DATA_URL = '/candidatos.json'
+const DATA_URL = (import.meta.env.BASE_URL || '/') + 'candidatos.json'
 
 function completitud(c) {
   const campos = [c.email, c.telefono, c.categoria, c.area, c.job_title, c.skills, c.video_link, c.reel_link, c.portfolio_link, c.linkedin_link, c.experiencia, c.educacion, c.notas]
@@ -24,20 +24,35 @@ function normalizeCategory(c) {
 export default function App() {
   const [raw, setRaw] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
   const [filtrosAplicados, setFiltrosAplicados] = useState({ categoria: '', area: '', job_title: '', skills: '' })
   const [selected, setSelected] = useState(null)
 
-  useEffect(() => {
+  const loadData = () => {
+    setError(null)
+    setLoading(true)
     fetch(DATA_URL)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error('No se pudo cargar los datos')
+        return r.json()
+      })
       .then(data => {
         const list = Array.isArray(data) ? data : []
-        setRaw(list.map(c => ({ ...c, skills: Array.isArray(c.skills) ? c.skills : (c.skills ? String(c.skills).split(',').map(s => s.trim()) : []) })))
+        setRaw(list.map((c, i) => ({
+          ...c,
+          id: c.id ?? i + 1,
+          skills: Array.isArray(c.skills) ? c.skills : (c.skills ? String(c.skills).split(',').map(s => s.trim()).filter(Boolean) : [])
+        })))
       })
-      .catch(() => setRaw([]))
+      .catch(err => {
+        setError(err.message || 'Error al cargar')
+        setRaw([])
+      })
       .finally(() => setLoading(false))
-  }, [])
+  }
+
+  useEffect(() => { loadData() }, [])
 
   const sorted = useMemo(() => {
     const withComp = raw.map(c => ({ ...c, completitud: completitud(c) }))
@@ -55,7 +70,7 @@ export default function App() {
     const areas = [...new Set(raw.map(c => c.area).filter(Boolean))].sort()
     const jobTitles = [...new Set(raw.map(c => c.job_title).filter(Boolean))].sort()
     const skillsSet = new Set()
-    raw.forEach(c => (c.skills || []).forEach(s => skillsSet.add(s)))
+    raw.forEach(c => (c.skills || []).forEach(s => { if (s && String(s).trim()) skillsSet.add(String(s).trim()) }))
     return { categorias, areas, jobTitles, skills: [...skillsSet].sort() }
   }, [raw])
 
@@ -78,7 +93,7 @@ export default function App() {
     if (filtrosAplicados.categoria) list = list.filter(c => c.categoria === filtrosAplicados.categoria)
     if (filtrosAplicados.area) list = list.filter(c => c.area === filtrosAplicados.area)
     if (filtrosAplicados.job_title) list = list.filter(c => c.job_title === filtrosAplicados.job_title)
-    if (filtrosAplicados.skills) list = list.filter(c => (c.skills || []).some(s => s && s.includes(filtrosAplicados.skills)))
+    if (filtrosAplicados.skills) list = list.filter(c => (c.skills || []).some(s => s && String(s).toLowerCase().includes(String(filtrosAplicados.skills).toLowerCase())))
     if (search.trim()) {
       const q = search.toLowerCase().trim()
       list = list.filter(c =>
@@ -92,10 +107,21 @@ export default function App() {
   const clearFiltros = () => setFiltrosAplicados({ categoria: '', area: '', job_title: '', skills: '' })
   const hasFiltros = Object.values(filtrosAplicados).some(Boolean)
 
-  if (loading) {
+  if (loading && raw.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <p className="text-gray-600">Cargando candidatos...</p>
+      </div>
+    )
+  }
+
+  if (error && raw.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 p-6">
+        <p className="text-red-600 font-medium">{error}</p>
+        <p className="text-gray-600 text-sm text-center">Si la app está en Vercel, comprueba que el archivo public/candidatos.json esté en el repositorio.</p>
+        <button onClick={loadData} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Reintentar</button>
       </div>
     )
   }
@@ -137,9 +163,9 @@ export default function App() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map(c => (
+            {filtered.map((c, i) => (
               <CandidateCard
-                key={c.id}
+                key={c.id ?? i}
                 candidato={c}
                 showScore
                 isSelected={selected?.id === c.id}
