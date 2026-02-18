@@ -7,7 +7,7 @@ export default function Filters({ filtros, filtrosAplicados, onChange, onClear, 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
           <select
-            value={filtrosAplicados.categoria}
+            value={filtrosAplicados?.categoria ?? ''}
             onChange={(e) => onChange('categoria', e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
@@ -18,7 +18,7 @@ export default function Filters({ filtros, filtrosAplicados, onChange, onClear, 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Área</label>
           <select
-            value={filtrosAplicados.area}
+            value={filtrosAplicados?.area ?? ''}
             onChange={(e) => onChange('area', e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
@@ -29,7 +29,7 @@ export default function Filters({ filtros, filtrosAplicados, onChange, onClear, 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Puesto</label>
           <select
-            value={filtrosAplicados.job_title}
+            value={filtrosAplicados?.job_title ?? ''}
             onChange={(e) => onChange('job_title', e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
@@ -40,7 +40,7 @@ export default function Filters({ filtros, filtrosAplicados, onChange, onClear, 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Skill</label>
           <select
-            value={filtrosAplicados.skills}
+            value={filtrosAplicados?.skills ?? ''}
             onChange={(e) => onChange('skills', e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
           >

@@ -89,16 +89,26 @@ export default function App() {
   }, [top50])
 
   const filtered = useMemo(() => {
-    let list = sorted
-    if (filtrosAplicados.categoria) list = list.filter(c => c.categoria === filtrosAplicados.categoria)
-    if (filtrosAplicados.area) list = list.filter(c => c.area === filtrosAplicados.area)
-    if (filtrosAplicados.job_title) list = list.filter(c => c.job_title === filtrosAplicados.job_title)
-    if (filtrosAplicados.skills) list = list.filter(c => (c.skills || []).some(s => s && String(s).toLowerCase().includes(String(filtrosAplicados.skills).toLowerCase())))
-    if (search.trim()) {
-      const q = search.toLowerCase().trim()
-      list = list.filter(c =>
-        [c.nombre, c.email, c.job_title, (c.skills || []).join(' ')].some(s => s && String(s).toLowerCase().includes(q))
-      )
+    let list = [...sorted]
+    const { categoria, area, job_title, skills } = filtrosAplicados || {}
+    if (categoria) list = list.filter(c => String(c.categoria || '').trim() === String(categoria).trim())
+    if (area) list = list.filter(c => String(c.area || '').trim() === String(area).trim())
+    if (job_title) list = list.filter(c => String(c.job_title || '').trim() === String(job_title).trim())
+    if (skills) {
+      const skillLower = String(skills).toLowerCase().trim()
+      list = list.filter(c => (c.skills || []).some(s => s && String(s).toLowerCase().includes(skillLower)))
+    }
+    const q = (search || '').toLowerCase().trim()
+    if (q) {
+      list = list.filter(c => {
+        const nombre = String(c.nombre || '').toLowerCase()
+        const email = String(c.email || '').toLowerCase()
+        const cat = String(c.categoria || '').toLowerCase()
+        const areaStr = String(c.area || '').toLowerCase()
+        const job = String(c.job_title || '').toLowerCase()
+        const skillsStr = (c.skills || []).map(s => String(s || '').toLowerCase()).join(' ')
+        return nombre.includes(q) || email.includes(q) || cat.includes(q) || areaStr.includes(q) || job.includes(q) || skillsStr.includes(q)
+      })
     }
     return list
   }, [sorted, filtrosAplicados, search])
@@ -137,7 +147,7 @@ export default function App() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <SearchBar value={search} onChange={setSearch} />
+          <SearchBar value={search ?? ''} onChange={setSearch} />
           <Filters
             filtros={filtros}
             filtrosAplicados={filtrosAplicados}
